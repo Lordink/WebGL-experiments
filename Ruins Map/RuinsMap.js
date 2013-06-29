@@ -16,7 +16,7 @@ var BonSmoke = null;
 var fenceshader = null;
 
 $(function(){
-	var VIEW_ANGLE = 50, //vertical FOV. Horizontal is approx 80, I guess
+	var VIEW_ANGLE = 50,
 		ASPECT = WIDTH / HEIGHT,
 		NEAR = 0.1,
 		FAR = 100000;
@@ -73,7 +73,7 @@ $(function(){
 	RuinsMap.ShaderMaterials[0] = GroundShader; 
 	
 	
-	//Skysphere:
+	//Skysphere and ruins:
 	RuinsMap.ShaderMaterials[1] = new THREE.MeshBasicMaterial( {
 		map: THREE.ImageUtils.loadTexture("Media/clouds.png"),
 		depthWrite: false,
@@ -120,40 +120,8 @@ $(function(){
 	//Add SkySphere
 	RuinsMap.MeshLoader.load("Meshes/sky.js", Skyhandler);
 	
-	CParticleSystem = new CustomParticleSystem(
-	{
-		maxParticles: 10,
-		energyDecrement: 0.3,
-		PPS: 2.0,
-		material: new THREE.ParticleBasicMaterial({
-				color:0xff5f5f,
-				size: 1,
-				transparent: true,
-				map: THREE.ImageUtils.loadTexture( "Media/plasma.png" ),
-				blending: THREE.CustomBlending,
-				blendEquation: THREE.AddEquation,
-				blendSrc: THREE.SrcAlphaFactor,
-				blendDst: THREE.OneFactor,
-				depthWrite: false,
-				fog: true
-			}),
-			onParticleInit: function(particle)
-			{
-				particle.set(0,0,2);
-				particle.velocity = new THREE.Vector3(0,1.0,0);
-				
-				particle.energy = 1.0;	//Particle lifetime  
-			},
-			onParticleUpdate: function( particle, delta )
-			{ 
-				particle.add(particle.velocity.clone().multiplyScalar(delta));
-				particle.energy -= CParticleSystem.options.energyDecrement * delta;
-			}
-	}); 
-	CParticleSystem.start(RuinsMap.Scene);
-	
 	//bonfire code:	
-	BonFire = new CustomParticleSystem(
+	BonFire = new CustomParticleSystem( ///TOMAKE custom shader with particle energy attribute!
 	{
 		maxParticles: 100,
 		locationRange: 0.25, //how far from selected point particles can spawn
@@ -267,6 +235,7 @@ $(function(){
 	fence3.rotation.y = Math.PI/2;
 	RuinsMap.Scene.add(fence3);
 	
+	//Some cubemap test
 	var cubetextures = [
 		"nightsky/nightsky_west.png",
 		"nightsky/nightsky_east.png",
