@@ -38,34 +38,26 @@ $(function(){
 	$container.append(Renderer.domElement);
 	
 
-	
-	var pointLight = new THREE.PointLight( 0xFFFFFF );
-	
+	var dl_intensity = 0.4;
+	var dirlight = new THREE.DirectionalLight(0xFFFFFF, dl_intensity);
+	dirlight.position.set(1,1,0);
+	/*
+    var pointLight = new THREE.PointLight( 0xFFFFFF );
 	// set its position
 	pointLight.position.x = 10;
 	pointLight.position.y = 50;
 	pointLight.position.z = 130;
-	
+	Scene.add(pointLight);
+	*/
 	texture = "../Ruins Map/Media/SquaredConcrete1.jpg";
 	
-	BasicUniforms = { //U SHUD REWRITE ALL TIS SHIT
+	
+	BasicUniforms = { 
 		texture: { type: "t", value: THREE.ImageUtils.loadTexture(diffuse_texture) },
-		
-		u_DirLightColor: { type: "v3", value: new THREE.Vector3(1,1,0) },
+		u_DirLightColor: { type: "v3", value: new THREE.Vector3(dirlight.color.r, dirlight.color.g, dirlight.color.b) },
 		u_AmbientLightColor: { type: "v3", value: new THREE.Vector3(0, 1, 0) },
-		u_DirLightIntensity: { type: "f", value: this.DirLight.intensity},
-		u_DirLightDirection:{ type: "v3", value: Lightdir_XZYtoXYZ(this.DirLight.position) }, //Might not work
-		
-		u_SpotLightDirection: {type: "v3", value: this.SpotLightDirection },
-		u_SpotLightPosition: { type: "v3", value: new THREE.Vector3(this.SpotLight.position.x, this.SpotLight.position.y, this.SpotLight.position.z) },
-		u_SpotLightColor: { type: "v3", value: new THREE.Vector3(this.SpotLight.color.r, this.SpotLight.color.g, this.SpotLight.color.b) },
-		u_SpotLightExp: { type: "f", value: this.SpotLight.exponent},
-		u_SpotLightAngle: { type: "f", value: this.SpotLight.angle},
-		u_SpotLightDistance: { type: "f", value: this.SpotLight.distance },
-		
-		fogColor:{ type: "v3", value: new THREE.Vector3(this.Scene.fog.color.r, this.Scene.fog.color.g, this.Scene.fog.color.b) },
-		fogNear:{ type: "f", value: this.Scene.fog.near },
-		fogFar:{ type: "f", value: this.Scene.fog.far },
+		u_DirLightIntensity: { type: "f", value: dl_intensity},
+		u_DirLightDirection:{ type: "v3", value: new THREE.Vector3(1,0,0) },
 	};
 	
 	
@@ -77,13 +69,14 @@ $(function(){
 	});
 	
 	// add to the scene
-	Scene.add(pointLight);
+    Scene.add(dirlight);
 	
 	
 	Cube = new THREE.Mesh
 	(
 	new THREE.CubeGeometry(10, 10, 10, 1,1,1),
-	BasicLight
+	//BasicLight
+	new THREE.MeshLambertMaterial({ color: 0xFF00F0 })
 	);
 	
 	Scene.add(Cube);
@@ -92,10 +85,12 @@ $(function(){
 });
 
 function Update(){
-	Renderer.setClearColorHex(0x000000, 1.0);
+	Renderer.setClearColorHex(0xffffff, 1.0);
 	Renderer.clear(true);
 	
+	Cube.rotation.y += 0.01;
 	Cube.rotation.x += 0.01;
+	Cube.rotation.z += 0.01;
 	
 	Renderer.render(Scene, Camera);
 	requestAnimationFrame(Update)
