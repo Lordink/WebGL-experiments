@@ -37,8 +37,9 @@ $(function(){
 	
 	$container.append(Renderer.domElement);
 	
-
-	var dl_intensity = 0.4;
+	var PointLight = new THREE.PointLight(0xFF0000, 0.5, 20);
+	 
+	var dl_intensity = 0.2;
 	var dirlight = new THREE.DirectionalLight(0xFFFFFF, dl_intensity);
 	dirlight.position.set(1,1,0);
 	/*
@@ -53,11 +54,16 @@ $(function(){
 	
 	
 	BasicUniforms = { 
-		texture: { type: "t", value: THREE.ImageUtils.loadTexture(diffuse_texture) },
+		texture: { type: "t", value: THREE.ImageUtils.loadTexture(texture) },
 		u_DirLightColor: { type: "v3", value: new THREE.Vector3(dirlight.color.r, dirlight.color.g, dirlight.color.b) },
-		u_AmbientLightColor: { type: "v3", value: new THREE.Vector3(0, 1, 0) },
+		u_AmbientLightColor: { type: "v3", value: new THREE.Vector3(0, 0.1, 0) },
 		u_DirLightIntensity: { type: "f", value: dl_intensity},
 		u_DirLightDirection:{ type: "v3", value: new THREE.Vector3(1,0,0) },
+		
+		u_PLightIntensity:{ type: "f", value: PointLight.intensity},
+		u_PLightDistance:{ type: "f", value: PointLight.distance},
+		u_PLightPosition:{type: "v3", value: AssemblePosition(PointLight.position)},
+		u_PLightColor:{type: "v3", value: AssembleColor(Pointlight.color)}
 	};
 	
 	
@@ -75,8 +81,8 @@ $(function(){
 	Cube = new THREE.Mesh
 	(
 	new THREE.CubeGeometry(10, 10, 10, 1,1,1),
-	//BasicLight
-	new THREE.MeshLambertMaterial({ color: 0xFF00F0 })
+	BasicLight
+	//new THREE.MeshLambertMaterial({ color: 0xFF00F0 })
 	);
 	
 	Scene.add(Cube);
@@ -88,10 +94,25 @@ function Update(){
 	Renderer.setClearColorHex(0xffffff, 1.0);
 	Renderer.clear(true);
 	
-	Cube.rotation.y += 0.01;
-	Cube.rotation.x += 0.01;
-	Cube.rotation.z += 0.01;
+	Cube.rotation.y += 0.03;
+	var DLLocDir = new THREE.Vector3(1,0,0);
+	DLLocDir = Camera.localToWorld(DLLocDir);
+	BasicUniforms.u_DirLightDirection.value = DLLocDir;
+	
 	
 	Renderer.render(Scene, Camera);
 	requestAnimationFrame(Update)
 }
+
+
+/// //////////////////////////////
+//some helpy things
+function AssemblePosition(object){
+	return new THREE.Vector3(object.x, object.y, object.z);
+}
+
+function AssembleColor(object){
+	return new THREE.Vector3(object.r, object.g, object.b);
+}
+
+/// //////////////////////////////
